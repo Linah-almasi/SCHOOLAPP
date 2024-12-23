@@ -1,24 +1,5 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const SchoolApp());
-}
-
-class SchoolApp extends StatelessWidget {
-  const SchoolApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'School App',
-      theme: ThemeData(primarySwatch: Colors.teal),
-      home: const LoginPage(),
-    );
-  }
-}
+import 'database_helper.dart'; // Import the database helper
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -32,19 +13,23 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login() {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
+  Future<void> _login() async {
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
 
-    if (username == 'admin' && password == 'password123') {
-      // Navigate to HomePage on successful login
+    final user = await DatabaseHelper.instance.getUser(username);
+
+    if (user != null && user['password'] == password) {
+      // Successful login
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
       // Show error dialog
       showDialog(
+        // ignore: use_build_context_synchronously
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Login Failed'),

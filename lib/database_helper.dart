@@ -1,25 +1,21 @@
 import 'dart:async';
 import 'package:sqflite/sqflite.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  // Singleton instance
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
   static Database? _database;
 
-  // Private constructor
   DatabaseHelper._privateConstructor();
 
-  // Getter for the database
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
-  // Initialize the database
   Future<Database> _initDatabase() async {
-    // Define the path for the database
     String path = join(await getDatabasesPath(), 'school_app.db');
     return await openDatabase(
       path,
@@ -28,7 +24,6 @@ class DatabaseHelper {
     );
   }
 
-  // Create the database tables
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE users (
@@ -37,9 +32,11 @@ class DatabaseHelper {
         password TEXT NOT NULL
       )
     ''');
+    await db.insert('users', {'username': 'admin', 'password': 'password123'});
+    await db.insert('users', {'username': 'teacher', 'password': 'teach456'});
+    await db.insert('users', {'username': 'student', 'password': 'stud789'});
   }
 
-  // Insert a user into the database
   Future<int> insertUser(String username, String password) async {
     Database db = await instance.database;
     return await db.insert(
@@ -48,7 +45,6 @@ class DatabaseHelper {
     );
   }
 
-  // Retrieve a user by username
   Future<Map<String, dynamic>?> getUser(String username) async {
     Database db = await instance.database;
     List<Map<String, dynamic>> result = await db.query(
@@ -59,4 +55,3 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first : null;
   }
 }
-a
